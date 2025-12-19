@@ -1,5 +1,18 @@
 local M = {}
-M.say_hello = function()
+
+local plugin_root = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h:h:h")
+local default_opts = {
+	templatepath = plugin_root .. "/template.md",
+	folderpath = nil,
+}
+
+M.config = {}
+
+M.setup = function(opt)
+	M.config = vim.tbl_deep_extend("force", default_opts, opt or {})
+end
+
+M.create_today_file = function()
 	local function file_exists(name)
 		local f = io.open(name, "r")
 		if f ~= nil then
@@ -10,23 +23,39 @@ M.say_hello = function()
 		end
 	end
 
-	-- TODO:
-	-- get template path from options
-	-- get folder path from options
-	-- show current date file in popup
-	local templatePath = "./template.md"
-	local date = os.date("%Y-%m-%d")
-	local filePath = "./" .. date .. ".md"
-	if file_exists(filePath) then
-		print("File exists!")
-	else
-		local file, err = io.open(filePath, "a")
-		if not file then
-			print("Error creating file: " .. err)
+	local function read_template()
+		local fullPath = vim.fn.expand(M.config.templatepath)
+		local input = io.open(fullPath, "r")
+		if not input then
 			return
 		end
-		file:write("This is a test file.")
+
+		local content = input:read("*all")
+		input:close()
+		return content
+	end
+
+	local template = read_template()
+	local date = os.date("%Y-%m-%d-%M-%S")
+
+	if M.config.folderpath == nil then
+		print("Please set folderpath in config")
+		return
+	end
+
+	local fullFolderPath = vim.fn.expand(M.config.folderpath)
+	local filePath = fullFolderPath .. date .. ".md"
+	if file_exists(filePath) == false then
+		local file, err = io.open(filePath, "a")
+		if not file then
+			print("Error creating Today file: " .. err)
+			return
+		end
+
+		file:write(template)
 		file:close()
+		print("Today: " .. filePath)
 	end
 end
+
 return M
