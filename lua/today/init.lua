@@ -36,7 +36,7 @@ M.create_today_file = function()
 	end
 
 	local template = read_template()
-	local date = os.date("%Y-%m-%d-%M-%S")
+	local date = os.date("%Y-%m-%d")
 
 	if M.config.folderpath == nil then
 		print("Please set folderpath in config")
