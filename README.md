@@ -16,6 +16,7 @@ LazyVim
 ### Usage
 
 :TodayOpen and :Today — Create/Open daily note in the current buffer
+
 :TodayToggle - Create/Open daily note in a floating window. (q - Close window and auto-save)
 
 ### Configuration
