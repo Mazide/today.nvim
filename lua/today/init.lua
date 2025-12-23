@@ -26,6 +26,10 @@ local state = {
 M.setup = function(opt)
 	M.config = vim.tbl_deep_extend("force", default_opts, opt or {})
 
+	vim.api.nvim_create_user_command("Today", function()
+		M.open_period("%Y-%m-%d")
+	end, {})
+
 	vim.api.nvim_create_user_command("TodayOpen", function()
 		M.open_period("%Y-%m-%d")
 	end, {})
