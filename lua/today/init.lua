@@ -122,23 +122,27 @@ local function create_file_if_not_exists(date)
 	return filePath
 end
 
+local function turn_auto_save_on()
+	local group = vim.api.nvim_create_augroup("TodayAutosave", { clear = false })
+	vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
+	vim.api.nvim_create_autocmd("WinLeave", {
+		buffer = bufnr,
+		group = group,
+		callback = function()
+			if vim.api.nvim_buf_is_valid(bufnr) then
+				vim.cmd("silent! write")
+			end
+		end,
+	})
+end
+
 local function create_bindings(bufnr, autosave)
 	vim.keymap.set("n", "q", function()
 		close_window()
 	end, { buffer = bufnr, nowait = true, silent = true })
 
 	if autosave then
-		local group = vim.api.nvim_create_augroup("TodayAutosave", { clear = false })
-		vim.api.nvim_clear_autocmds({ buffer = bufnr, group = group })
-		vim.api.nvim_create_autocmd("WinLeave", {
-			buffer = bufnr,
-			group = group,
-			callback = function()
-				if vim.api.nvim_buf_is_valid(bufnr) then
-					vim.cmd("silent! write")
-				end
-			end,
-		})
+		turn_auto_save_on()
 	end
 end
 
